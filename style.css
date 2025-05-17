@@ -4,6 +4,7 @@
     width: 50vw;
     height: 90vh;
     max-height: 600px;
+    max-width: 500px;
     box-sizing: border-box;
     margin: auto;
     align-items: stretch;
@@ -42,8 +43,22 @@ h1 {
     width: 100%;
     margin: auto 0;
     text-align: right;
+    font-family: 'Courier New', Courier, monospace;
+    color: rgb(0, 255, 0);
 }
 
 .digit {
     background-color: coral;
+}
+
+.digit:active {
+    background-color: tomato;
+}
+
+.operator {
+    background-color:cadetblue;
+}
+
+.operator:active {
+    background-color:steelblue;
 }

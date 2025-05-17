@@ -29,6 +29,24 @@ const display = document.querySelector("div.display>h1");
 const digitButtons = document.querySelectorAll("button.digit");
 const operatorButtons = document.querySelectorAll("button.operator");
 const clearButton = document.querySelector("#clear");
+const decimalButton = document.querySelector("#decimal");
+
+// TODO:
+// - add +/- functionality
+// - add % functionality
+// - fix text overflow due to rounding - e.g. 100000000000000000000 goes outside the box
+// - Adding 0 after decimal point doesn't show up until another digit is added, e.g.
+//     "1.0000" shows as "1" until a "2" is added, at which point it shows as "1.00002
+//   - Similarly, adding a "." doesn't appear until 
+// - fix floating point issue - e.g. 0.1 + 0.2 = 0.30000000000000004, 12.3 + 45.6 = 57.900000000000006
+//   - https://0.30000000000000004.com/
+// - Fix issue where adding a new number after a calculation doesn't clear the previous - see below
+
+// Current issue: if 1+2 is calculated, then = is hit giving 3,
+// then 4 and = or another operator are hit, it returns 3 as 3 is still stored as num2
+// 
+// Expected behaviour: typing "4 =" or "4 +" should ALWAYS return 4, 
+// not the previously stored number
 
 digitButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -44,57 +62,16 @@ clearButton.addEventListener("click", () => {
     isNum1 = true;
     currentOperator = null;
     display.textContent = numString1;
+    decimalButton.disabled = false;
 })
 
-operatorButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-        if (currentOperator == null) {
-            currentOperator = btn.textContent;
-            num1 = +numString1;
-            isNum1 = false;
-        } else {
-            //to do: move num2 = +numstring2 lines out of cases up here
-            switch(currentOperator) {
-                case "+":
-                    num2 = +numString2;
-                    numString1 = String(add(num1,num2));
-                    num1 = +numString1;
-                    break;
-                case "-":
-                    num2 = +numString2;
-                    numString1 = String(subtract(num1,num2));
-                    num1 = +numString1;
-                    break;
-                case "*":
-                    num2 = +numString2;
-                    numString1 = String(multiply(num1,num2));
-                    num1 = +numString1;
-                    break;
-                case "/":
-                    num2 = +numString2;
-                    numString1 = String(divide(num1,num2));                    
-                    num1 = +numString1;
-                    break;
-                case "x^y":
-                    num2 = +numString2;
-                    numString1 = String(power(num1,num2));
-                    num1 = +numString1;
-                    break;
-                case "=":
-                    //break out = as a separate button and its own listener?
-                    num2 = +numString2;
-                    num1 = +numString1;
-                    break;
-                default:
-                    //default
-            }
-            //to do: move num1 = +numstring1 lines out of cases down here
-            numString2 = "0";
-            display.textContent = +numString1;
-            currentOperator = btn.textContent;
-        }
-        console.log(btn.textContent);
-    })    
+decimalButton.addEventListener("click", () => {
+    if (isNum1) {
+        numString1 += ".";
+    } else {
+        numString2 += ".";
+    }
+    decimalButton.disabled = true;
 })
 
 function typeDigit(digit) {
@@ -106,3 +83,43 @@ function typeDigit(digit) {
         display.textContent = +numString2;
     }
 }
+
+operatorButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+        if (currentOperator == null) {
+            currentOperator = btn.textContent;
+            num1 = +numString1;
+            isNum1 = false;
+        } else {
+            num2 = +numString2;
+            switch(currentOperator) {
+                case "+":
+                    numString1 = String(add(num1,num2));
+                    break;
+                case "-":
+                    numString1 = String(subtract(num1,num2));
+                    break;
+                case "*":
+                    numString1 = String(multiply(num1,num2));
+                    break;
+                case "/":
+                    numString1 = String(divide(num1,num2));
+                    break;
+                case "x^y":
+                    numString1 = String(power(num1,num2));
+                    break;
+                case "=":
+                    // break out "=" as a separate button and its own listener?
+                    break;
+                default:
+                    //default
+            }
+            num1 = +numString1;
+            numString2 = "0";
+            display.textContent = +numString1;
+            currentOperator = btn.textContent;
+        }
+        decimalButton.disabled = false;
+        console.log(btn.textContent);
+    })    
+})
